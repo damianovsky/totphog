@@ -45,19 +45,19 @@ Think of it like [MailHog](https://github.com/mailhog/MailHog) - but instead of 
 
 ### Docker (Recommended)
 
-\`\`\`bash
+```bash
 docker run -d -p 8045:80 --name totphog damianovsky/totphog
-\`\`\`
+```
 
 Open http://localhost:8045
 
 ### Docker Compose
 
-\`\`\`bash
+```bash
 git clone https://github.com/damianovsky/totphog.git
 cd totphog
 docker-compose up -d
-\`\`\`
+```
 
 ---
 
