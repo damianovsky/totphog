@@ -1,0 +1,520 @@
+openapi: 3.0.3
+info:
+  title: TOTPHog API
+  description: |
+    REST API for TOTPHog - a self-hosted TOTP code manager for development and testing.
+    
+    **Warning:** This service is designed for development only. No authentication, tokens stored in plain JSON.
+  version: 1.0.0
+  contact:
+    name: TOTPHog
+    url: https://github.com/damianovsky/totphog
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: http://localhost:8045/api/v1
+    description: Local development server
+
+tags:
+  - name: Tokens
+    description: TOTP token management
+  - name: Codes
+    description: TOTP code generation
+  - name: System
+    description: System endpoints
+
+paths:
+  /health:
+    get:
+      tags:
+        - System
+      summary: Health check
+      description: Check if the service is running
+      operationId: healthCheck
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+              example:
+                status: ok
+                service: TOTPHog
+                version: 1.0.0
+                timestamp: '2024-01-15T10:30:00+00:00'
+
+  /tokens:
+    get:
+      tags:
+        - Tokens
+      summary: List all tokens
+      description: Get all stored TOTP tokens
+      operationId: listTokens
+      responses:
+        '200':
+          description: List of tokens
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenListResponse'
+              example:
+                success: true
+                data:
+                  - id: '550e8400-e29b-41d4-a716-446655440000'
+                    name: GitHub
+                    secret: JBSWY3DPEHPK3PXP
+                    issuer: GitHub
+                    digits: 6
+                    period: 30
+                    algorithm: sha1
+                    created_at: '2024-01-15T10:30:00+00:00'
+                count: 1
+
+    post:
+      tags:
+        - Tokens
+      summary: Create a token
+      description: |
+        Create a new TOTP token. Supports two methods:
+        1. From OTPAuth URI (provide `uri` field)
+        2. Manual parameters (provide `name` and `secret` fields)
+      operationId: createToken
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTokenRequest'
+            examples:
+              fromUri:
+                summary: From OTPAuth URI
+                value:
+                  uri: 'otpauth://totp/GitHub:user@example.com?secret=JBSWY3DPEHPK3PXP&issuer=GitHub'
+              manual:
+                summary: Manual parameters
+                value:
+                  name: GitHub
+                  secret: JBSWY3DPEHPK3PXP
+                  issuer: GitHub
+                  digits: 6
+                  period: 30
+                  algorithm: sha1
+      responses:
+        '201':
+          description: Token created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                error: 'Name and secret are required'
+
+    delete:
+      tags:
+        - Tokens
+      summary: Delete all tokens
+      description: Delete all stored TOTP tokens
+      operationId: deleteAllTokens
+      responses:
+        '200':
+          description: All tokens deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteAllResponse'
+              example:
+                success: true
+                message: 'Deleted 5 tokens'
+                deleted_count: 5
+
+  /tokens/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: Token UUID
+        schema:
+          type: string
+          format: uuid
+        example: '550e8400-e29b-41d4-a716-446655440000'
+
+    get:
+      tags:
+        - Tokens
+      summary: Get a token
+      description: Get a single token by ID
+      operationId: getToken
+      responses:
+        '200':
+          description: Token found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenResponse'
+        '404':
+          description: Token not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                error: 'Token not found'
+
+    delete:
+      tags:
+        - Tokens
+      summary: Delete a token
+      description: Delete a token by ID
+      operationId: deleteToken
+      responses:
+        '200':
+          description: Token deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessageResponse'
+              example:
+                success: true
+                message: 'Token deleted'
+        '404':
+          description: Token not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /tokens/{id}/code:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: Token UUID
+        schema:
+          type: string
+          format: uuid
+
+    get:
+      tags:
+        - Codes
+      summary: Get current code
+      description: Get the current TOTP code for a token
+      operationId: getCode
+      responses:
+        '200':
+          description: Current code
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CodeResponse'
+              example:
+                success: true
+                data:
+                  code: '123456'
+                  remaining_seconds: 15
+                  period: 30
+                  generated_at: '2024-01-15T10:30:00+00:00'
+        '404':
+          description: Token not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /tokens/{id}/qr:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: Token UUID
+        schema:
+          type: string
+          format: uuid
+
+    get:
+      tags:
+        - Tokens
+      summary: Get QR code
+      description: Get a QR code image (PNG) for a token that can be scanned by authenticator apps
+      operationId: getQrCode
+      responses:
+        '200':
+          description: QR code image
+          content:
+            image/png:
+              schema:
+                type: string
+                format: binary
+        '404':
+          description: Token not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /codes:
+    get:
+      tags:
+        - Codes
+      summary: Get all codes
+      description: Get current TOTP codes for all tokens
+      operationId: getAllCodes
+      responses:
+        '200':
+          description: All current codes
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AllCodesResponse'
+
+components:
+  schemas:
+    Token:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Token UUID
+          example: '550e8400-e29b-41d4-a716-446655440000'
+        name:
+          type: string
+          description: Display name
+          example: GitHub
+        secret:
+          type: string
+          description: Base32-encoded secret
+          example: JBSWY3DPEHPK3PXP
+        issuer:
+          type: string
+          description: Service name
+          example: GitHub
+        digits:
+          type: integer
+          description: Code length
+          example: 6
+        period:
+          type: integer
+          description: Validity period (seconds)
+          example: 30
+        algorithm:
+          type: string
+          enum: [sha1, sha256, sha512]
+          description: Hash algorithm
+          example: sha1
+        created_at:
+          type: string
+          format: date-time
+          description: Creation timestamp
+          example: '2024-01-15T10:30:00+00:00'
+      required:
+        - id
+        - name
+        - secret
+        - issuer
+        - digits
+        - period
+        - algorithm
+        - created_at
+
+    Code:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Current TOTP code
+          example: '123456'
+        remaining_seconds:
+          type: integer
+          description: Seconds until code expires
+          example: 15
+        period:
+          type: integer
+          description: Code validity period
+          example: 30
+        generated_at:
+          type: string
+          format: date-time
+          description: Generation timestamp
+          example: '2024-01-15T10:30:00+00:00'
+      required:
+        - code
+        - remaining_seconds
+        - period
+        - generated_at
+
+    TokenWithCode:
+      allOf:
+        - $ref: '#/components/schemas/Token'
+        - type: object
+          properties:
+            current_code:
+              $ref: '#/components/schemas/Code'
+
+    CreateTokenRequest:
+      type: object
+      properties:
+        uri:
+          type: string
+          description: OTPAuth URI from QR code
+          example: 'otpauth://totp/GitHub:user@example.com?secret=JBSWY3DPEHPK3PXP&issuer=GitHub'
+        name:
+          type: string
+          description: Display name (required if uri not provided)
+          example: GitHub
+        secret:
+          type: string
+          description: Base32-encoded secret (required if uri not provided)
+          example: JBSWY3DPEHPK3PXP
+        issuer:
+          type: string
+          description: Service name
+          default: TOTPHog
+          example: GitHub
+        digits:
+          type: integer
+          description: Code length
+          default: 6
+          example: 6
+        period:
+          type: integer
+          description: Validity period (seconds)
+          default: 30
+          example: 30
+        algorithm:
+          type: string
+          enum: [sha1, sha256, sha512]
+          description: Hash algorithm
+          default: sha1
+          example: sha1
+
+    TokenResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          $ref: '#/components/schemas/Token'
+      required:
+        - success
+        - data
+
+    TokenListResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Token'
+        count:
+          type: integer
+          example: 1
+      required:
+        - success
+        - data
+        - count
+
+    CodeResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          $ref: '#/components/schemas/Code'
+      required:
+        - success
+        - data
+
+    AllCodesResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/TokenWithCode'
+      required:
+        - success
+        - data
+
+    HealthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: ok
+        service:
+          type: string
+          example: TOTPHog
+        version:
+          type: string
+          example: 1.0.0
+        timestamp:
+          type: string
+          format: date-time
+          example: '2024-01-15T10:30:00+00:00'
+      required:
+        - status
+        - service
+        - version
+        - timestamp
+
+    SuccessMessageResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: 'Token deleted'
+      required:
+        - success
+        - message
+
+    DeleteAllResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: 'Deleted 5 tokens'
+        deleted_count:
+          type: integer
+          example: 5
+      required:
+        - success
+        - message
+        - deleted_count
+
+    ErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: string
+          example: 'Token not found'
+      required:
+        - success
+        - error
