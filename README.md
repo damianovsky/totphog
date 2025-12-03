@@ -53,10 +53,19 @@ Open http://localhost:8045
 
 ### Docker Compose
 
+- 1. Clone the repository
 ```bash
 git clone https://github.com/damianovsky/totphog.git
+```
+
+- 2. Navigate to the project directory
+```bash
 cd totphog
-docker-compose up -d
+```
+
+- 3. Start the containers
+```bash
+docker compose up -d
 ```
 
 ---

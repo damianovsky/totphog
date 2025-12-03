@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="200" height="200">
+  <!-- Background circle -->
+  <circle cx="50" cy="50" r="48" fill="#1a1a2e"/>
+  
+  <!-- Pig face -->
+  <ellipse cx="50" cy="55" rx="30" ry="28" fill="#ff9eb5"/>
+  
+  <!-- Ears -->
+  <ellipse cx="25" cy="32" rx="10" ry="12" fill="#ff9eb5"/>
+  <ellipse cx="75" cy="32" rx="10" ry="12" fill="#ff9eb5"/>
+  <ellipse cx="25" cy="32" rx="6" ry="8" fill="#ffb6c8"/>
+  <ellipse cx="75" cy="32" rx="6" ry="8" fill="#ffb6c8"/>
+  
+  <!-- Eyes -->
+  <circle cx="38" cy="48" r="5" fill="#1a1a2e"/>
+  <circle cx="62" cy="48" r="5" fill="#1a1a2e"/>
+  <circle cx="39" cy="47" r="2" fill="white"/>
+  <circle cx="63" cy="47" r="2" fill="white"/>
+  
+  <!-- Snout -->
+  <ellipse cx="50" cy="62" rx="14" ry="10" fill="#ffb6c8"/>
+  
+  <!-- Nostrils -->
+  <ellipse cx="44" cy="62" rx="3" ry="4" fill="#ff9eb5"/>
+  <ellipse cx="56" cy="62" rx="3" ry="4" fill="#ff9eb5"/>
+  
+  <!-- TOTP code display -->
+  <rect x="30" y="76" rx="3" ry="3" width="40" height="12" fill="#00d9ff"/>
+  <text x="50" y="85" font-family="Monaco, monospace" font-size="8" fill="#1a1a2e" text-anchor="middle" font-weight="bold">TOTPHog</text>
+</svg>

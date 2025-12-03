@@ -3,8 +3,9 @@
 {% block body %}
 <div class="container py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="h3 mb-0">
-            <i class="bi bi-shield-lock me-2"></i>TOTPHog
+        <h1 class="h3 mb-0 d-flex align-items-center">
+            <img src="/favicon.svg" alt="TOTPHog" width="32" height="32" class="me-2">
+            TOTPHog
         </h1>
         <div>
             <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addModal">
@@ -38,7 +39,7 @@
                                 <small class="text-muted">{{ token.issuer }}</small>
                             </div>
                             <div class="btn-group btn-group-sm">
-                                <button class="btn btn-outline-secondary" onclick="copyCode(this)" data-code="{{ token.current_code.code }}" title="Copy">
+                                <button class="btn btn-outline-secondary copy-btn" onclick="copyCode(this)" title="Copy">
                                     <i class="bi bi-clipboard"></i>
                                 </button>
                                 <button class="btn btn-outline-danger" onclick="deleteToken('{{ token.id }}')" title="Delete">
@@ -186,7 +187,7 @@ async function deleteAll() {
 }
 
 function copyCode(btn) {
-    const code = btn.dataset.code || btn.closest('.card').querySelector('.code-display').textContent;
+    const code = btn.closest('.card').querySelector('.code-display').textContent.trim();
     navigator.clipboard.writeText(code);
     btn.innerHTML = '<i class="bi bi-check"></i>';
     setTimeout(() => btn.innerHTML = '<i class="bi bi-clipboard"></i>', 1000);
@@ -205,10 +206,8 @@ setInterval(async () => {
             const codeEl = card.querySelector('.code-display');
             const timerEl = card.querySelector('.timer');
             const progressEl = card.querySelector('.progress-bar');
-            const copyBtn = card.querySelector('[data-code]');
             
             codeEl.textContent = token.current_code.code;
-            if (copyBtn) copyBtn.dataset.code = token.current_code.code;
             timerEl.textContent = token.current_code.remaining_seconds + 's';
             
             const pct = (token.current_code.remaining_seconds / token.period) * 100;

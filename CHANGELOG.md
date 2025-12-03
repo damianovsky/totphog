@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.1] - 2025-12-03
+
+### Added
+
+- SVG favicon for the web interface
+- Logo in the page header
+
+### Fixed
+
+- Copy button now correctly copies the current TOTP code instead of stale value
+
 ## [1.0.0] - 2025-12-03
 
 ### Added
@@ -49,4 +60,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Bootstrap 5 for UI
 - Apache in Docker container
 
+[1.0.1]: https://github.com/damianovsky/totphog/releases/tag/v1.0.1
 [1.0.0]: https://github.com/damianovsky/totphog/releases/tag/v1.0.0
