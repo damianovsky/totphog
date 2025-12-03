@@ -1,13 +1,16 @@
----
-layout: default
-title: API Reference
----
-
 # API Reference
 
 TOTPHog provides a REST API for programmatic access to TOTP tokens and codes.
 
 **Base URL:** `http://localhost:8045/api/v1`
+
+---
+
+## Interactive API Documentation
+
+<swagger-ui src="openapi.yaml"/>
+
+---
 
 ## Response Format
 
@@ -317,6 +320,35 @@ curl http://localhost:8045/api/v1/codes
 curl -X DELETE http://localhost:8045/api/v1/tokens/{id}
 ```
 
+### PHP
+
+```php
+<?php
+// Create a token
+$ch = curl_init('http://localhost:8045/api/v1/tokens');
+curl_setopt_array($ch, [
+    CURLOPT_POST => true,
+    CURLOPT_RETURNTRANSFER => true,
+    CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
+    CURLOPT_POSTFIELDS => json_encode([
+        'name' => 'GitHub',
+        'secret' => 'JBSWY3DPEHPK3PXP'
+    ])
+]);
+$response = json_decode(curl_exec($ch), true);
+$token = $response['data'];
+curl_close($ch);
+
+// Get current code
+$ch = curl_init("http://localhost:8045/api/v1/tokens/{$token['id']}/code");
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+$codeResponse = json_decode(curl_exec($ch), true);
+$code = $codeResponse['data']['code'];
+curl_close($ch);
+
+echo "Current code: $code\n";
+```
+
 ### JavaScript (fetch)
 
 ```javascript
@@ -334,22 +366,59 @@ const { data: { code } } = await codeResponse.json();
 console.log('Current code:', code);
 ```
 
-### Python (requests)
+### Go
 
-```python
-import requests
+```go
+package main
 
-# Create a token
-response = requests.post('http://localhost:8045/api/v1/tokens', json={
-    'name': 'GitHub',
-    'secret': 'JBSWY3DPEHPK3PXP'
-})
-token = response.json()['data']
+import (
+	"bytes"
+	"encoding/json"
+	"fmt"
+	"net/http"
+)
 
-# Get current code
-code_response = requests.get(f'http://localhost:8045/api/v1/tokens/{token["id"]}/code')
-code = code_response.json()['data']['code']
-print(f'Current code: {code}')
+type TokenResponse struct {
+	Success bool `json:"success"`
+	Data    struct {
+		ID     string `json:"id"`
+		Name   string `json:"name"`
+		Secret string `json:"secret"`
+	} `json:"data"`
+}
+
+type CodeResponse struct {
+	Success bool `json:"success"`
+	Data    struct {
+		Code             string `json:"code"`
+		RemainingSeconds int    `json:"remaining_seconds"`
+	} `json:"data"`
+}
+
+func main() {
+	// Create a token
+	payload := []byte(`{"name": "GitHub", "secret": "JBSWY3DPEHPK3PXP"}`)
+	resp, _ := http.Post(
+		"http://localhost:8045/api/v1/tokens",
+		"application/json",
+		bytes.NewBuffer(payload),
+	)
+	defer resp.Body.Close()
+
+	var tokenResp TokenResponse
+	json.NewDecoder(resp.Body).Decode(&tokenResp)
+
+	// Get current code
+	codeResp, _ := http.Get(
+		fmt.Sprintf("http://localhost:8045/api/v1/tokens/%s/code", tokenResp.Data.ID),
+	)
+	defer codeResp.Body.Close()
+
+	var code CodeResponse
+	json.NewDecoder(codeResp.Body).Decode(&code)
+
+	fmt.Printf("Current code: %s\n", code.Data.Code)
+}
 ```
 
 ## OpenAPI Specification

@@ -1,8 +1,3 @@
----
-layout: default
-title: Getting Started
----
-
 # Getting Started
 
 This guide will help you get TOTPHog up and running quickly.
@@ -29,7 +24,7 @@ Open http://localhost:8045 in your browser.
 For a more configurable setup:
 
 ```bash
-git clone https://github.com/yourusername/totphog.git
+git clone https://github.com/damianovsky/totphog.git
 cd totphog
 docker-compose up -d
 ```
@@ -46,7 +41,7 @@ TOTPHOG_PORT=9000 docker-compose up -d
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/totphog.git
+   git clone https://github.com/damianovsky/totphog.git
    cd totphog
    ```
 
@@ -97,4 +92,4 @@ Get the current code:
 curl http://localhost:8045/api/v1/tokens/{id}/code
 ```
 
-See the [API Reference](api.md) for complete documentation.
+See the [API Reference](api) for complete documentation.

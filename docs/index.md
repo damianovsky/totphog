@@ -1,33 +1,36 @@
+# TOTPHog
+
+<p align="center">
+  <img src="assets/logo.svg" width="100" alt="TOTPHog Logo">
+</p>
+
+**A self-hosted TOTP code manager for development and testing.**  
+*Like MailHog, but for 2FA codes.*
+
 ---
-layout: default
-title: Home
----
-
-# TOTPHog Documentation
-
-Welcome to the TOTPHog documentation. TOTPHog is a self-hosted TOTP code manager designed for development and testing environments.
-
-## Table of Contents
-
-- [Getting Started](getting-started.md) - Installation and quick start guide
-- [API Reference](api.md) - Complete REST API documentation
-- [Configuration](configuration.md) - Configuration options and environment variables
-- [Architecture](architecture.md) - Technical architecture and design decisions
 
 ## What is TOTPHog?
 
-TOTPHog is a lightweight, self-hosted TOTP (Time-based One-Time Password) manager. Think of it like [MailHog](https://github.com/mailhog/MailHog) - but instead of catching emails, it manages TOTP codes.
+TOTPHog is a lightweight, self-hosted TOTP (Time-based One-Time Password) manager designed for **development and testing** environments.
 
 ### Use Cases
 
-- **Testing 2FA flows** - Test your app's two-factor authentication without a real authenticator
-- **Automated testing** - Get TOTP codes via REST API for E2E tests and CI/CD
-- **Team development** - Share test 2FA accounts without sharing authenticator apps
-- **Local development** - Quick access to TOTP codes without switching devices
+- :test_tube: **Testing 2FA flows** - Test your app's two-factor authentication without a real authenticator
+- :robot: **Automated testing** - Get TOTP codes via REST API for E2E tests and CI/CD
+- :busts_in_silhouette: **Team development** - Share test 2FA accounts without sharing authenticator apps
+- :wrench: **Local development** - Quick access to TOTP codes without switching devices
 
-> ⚠️ **Warning**: TOTPHog is designed for development only. It has no authentication and stores tokens in plain JSON. Never use in production environments.
+---
 
-## Quick Links
+## Quick Start
 
-- [OpenAPI/Swagger Specification](openapi.yaml)
-- [GitHub Repository](https://github.com/damianovsky/totphog)
+```bash
+docker run -d -p 8045:80 --name totphog damianovsky/totphog
+```
+
+Open [http://localhost:8045](http://localhost:8045)
+
+---
+
+!!! warning "Development Only"
+    TOTPHog is for development only. No authentication, tokens stored in plain JSON. **Never use in production.**

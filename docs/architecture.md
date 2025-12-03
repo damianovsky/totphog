@@ -1,8 +1,3 @@
----
-layout: default
-title: Architecture
----
-
 # Architecture
 
 This document describes the technical architecture of TOTPHog.

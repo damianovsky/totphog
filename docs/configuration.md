@@ -1,8 +1,3 @@
----
-layout: default
-title: Configuration
----
-
 # Configuration
 
 TOTPHog is designed to work out of the box with minimal configuration. This document covers all available configuration options.
